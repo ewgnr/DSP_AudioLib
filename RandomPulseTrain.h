@@ -9,7 +9,7 @@ public:
         : pulse(sampleRate)
 		, sampleRate(sampleRate) {}
 
-    double tick(double dt, double gap) 
+    double play(double dt, double gap) 
     {
         double freq = 1.0 / gap;
         return (pulse.play(freq) > 0.0) ? 1.0 : 0.0;

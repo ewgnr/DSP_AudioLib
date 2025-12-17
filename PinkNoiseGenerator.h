@@ -20,7 +20,6 @@ public:
     }
 
     inline void reset() { last = 0.0; }
-
     inline void setAmplitude(double a) { amp = a; }
 
 private:

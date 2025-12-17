@@ -23,7 +23,6 @@ public:
     }
 
     inline void reset() { out = 0.0; }
-
     inline void setSampleRate(double sr) { sampleRate = sr; }
 
 private:

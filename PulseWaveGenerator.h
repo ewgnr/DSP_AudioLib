@@ -20,9 +20,7 @@ public:
 
 
     inline void reset() { phase = 0.0; }
-
     inline void setSampleRate(double sr) { sampleRate = sr; }
-
     inline void setPulseWidth(double pw) 
     {
         if (pw < 0.0) pw = 0.0;
