@@ -20,10 +20,7 @@ public:
         return value;
     }
 
-    inline void reseed(unsigned int seed)
-    {
-        rng.seed(seed);
-    }
+    inline void reseed(unsigned int seed) { rng.seed(seed); }
 
 private:
     std::mt19937 rng;

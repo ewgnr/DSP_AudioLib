@@ -1,23 +1,26 @@
 #pragma once
 #include "Voice.h"
 
-template <int MaxVoices>
+#pragma once
+
+template <typename T = Voice, int MaxVoices = 16>
 class VoicePool
 {
 public:
-    inline Voice * allocate()
-    {
-        for (int i = 0; i < MaxVoices; ++i)
-        {
-            if (!voices[i].isActive())
-                return &voices[i];
-        }
-        return nullptr;
-    }
 
-    inline Voice & operator[](int index) { return voices[index]; }
-    inline constexpr int size() const { return MaxVoices; }
+	inline T * allocate()
+	{
+		for (int i = 0; i < MaxVoices; ++i)
+		{
+			if (!voices[i].isActive()) return &voices[i];
+		}
+		return nullptr;
+	}
+
+	inline T & operator[](int index) { return voices[index]; }
+
+	constexpr inline int size() const { return MaxVoices; }
 
 private:
-    Voice voices[MaxVoices];
+	T voices[MaxVoices];
 };

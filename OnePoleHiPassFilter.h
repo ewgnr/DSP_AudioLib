@@ -1,7 +1,12 @@
 #pragma once
 #include <cmath>
 
-class OnePoleHiPassFilter {
+#ifndef M_PI
+	#define M_PI 3.14159265358979323846
+#endif
+
+class OnePoleHiPassFilter
+{
 public:
     OnePoleHiPassFilter(double sampleRate = 44100.0)
         : out(0.0)
