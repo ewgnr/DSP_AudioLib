@@ -1,27 +1,36 @@
 #pragma once
 #include <cmath>
 
-class CosineToneGenerator 
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
+class CosineToneGenerator
 {
 public:
-    CosineToneGenerator(double sampleRate = 44100.0)
+    explicit CosineToneGenerator(double pSampleRate = 44100.0)
         : phase(0.0)
-        , sampleRate(sampleRate) {}
+        , sampleRate(pSampleRate) {}
 
-    inline double play(double pFreq) 
+    inline double play(double pFreq)
     {
-        double cosine = std::cos(phase * 2.0 * M_PI);
+        const double out = std::cos(phase * 2.0 * M_PI);
         phase += pFreq / sampleRate;
         if (phase >= 1.0) phase -= 1.0;
-
-        return cosine;
+        return out;
     }
 
-    inline void reset() { phase = 0.0; }
+    inline void reset()
+    {
+        phase = 0.0;
+    }
 
-    inline void setSampleRate(double sr) { sampleRate = sr; }
+    inline void setSampleRate(double pSampleRate)
+    {
+        sampleRate = pSampleRate;
+    }
 
 private:
-    double phase;
+    double phase = 0.0;
     double sampleRate;
 };

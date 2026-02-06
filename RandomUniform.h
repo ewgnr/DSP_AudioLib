@@ -1,26 +1,31 @@
 #pragma once
 #include <random>
+#include <algorithm>
 
 class RandomUniform
 {
 public:
-    RandomUniform(unsigned int seed = std::random_device{}())
-        : rng(seed) {}
+    explicit RandomUniform(unsigned int pSeed = std::random_device{}())
+        : rng(pSeed) {}
 
-    inline double next(double lo, double hi)
+    inline double next(double pLo, double pHi)
     {
-        std::uniform_real_distribution<double> dist(lo, hi);
+        std::uniform_real_distribution<double> dist(pLo, pHi);
         return dist(rng);
     }
 
-    inline double play(double trigger, double lo, double hi)
+    inline double play(double pTrigger, double pLo, double pHi)
     {
-        if (trigger > 0.0) value = next(lo, hi);
+        if (pTrigger > 0.0)
+            value = next(pLo, pHi);
 
         return value;
     }
 
-    inline void reseed(unsigned int seed) { rng.seed(seed); }
+    inline void reseed(unsigned int pSeed)
+    {
+        rng.seed(pSeed);
+    }
 
 private:
     std::mt19937 rng;

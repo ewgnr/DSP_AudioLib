@@ -1,34 +1,41 @@
 #pragma once
 #include "DelayBuffer.h"
+#include <algorithm>
 
 class AudioFbkDelay
 {
 public:
-    AudioFbkDelay() 
-        : output(0.0)
-        , maxDelaySamples(0) {}
-
-    void init(int pMaxDelaySamples)
+    explicit AudioFbkDelay(int pMaxDelaySamples = 0)
+        : maxDelaySamples(pMaxDelaySamples)
     {
-        delay.init(pMaxDelaySamples);
-        maxDelaySamples = pMaxDelaySamples;
-        output = 0.0;
+        if (pMaxDelaySamples > 0)
+            delay.init(pMaxDelaySamples);
     }
 
-    inline double play(double pIn, double pDelayTime, double pFbk)
+    inline void init(int pMaxDelaySamples)
     {
-        double delaySamples = pDelayTime * maxDelaySamples;
-        double delayed = delay.read(delaySamples);
+        maxDelaySamples = pMaxDelaySamples;
+        delay.init(maxDelaySamples);
+    }
 
-        double writeSample = pIn + delayed * pFbk;
-        delay.write(writeSample);
+    inline double play(double pIn, double pDelayTime, double pFeedback)
+    {
+        if (maxDelaySamples <= 0)
+            return 0.0;
 
-        output = delayed;
-        return output;
+        pDelayTime = std::clamp(pDelayTime, 0.0, 1.0);
+        const double delayed = delay.read(pDelayTime * maxDelaySamples);
+        delay.write(pIn + delayed * pFeedback);
+
+        return delayed;
+    }
+
+    inline void reset()
+    {
+        delay.clear();
     }
 
 private:
     DelayBuffer delay;
-    int maxDelaySamples;
-    double output;
+    int maxDelaySamples = 0;
 };

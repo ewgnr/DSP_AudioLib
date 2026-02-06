@@ -1,25 +1,25 @@
 #pragma once
 #include <cmath>
 
-class SawToothGenerator 
+class SawToothGenerator
 {
 public:
-    SawToothGenerator(double sampleRate = 44100.0)
+    explicit SawToothGenerator(double pSampleRate = 44100.0)
         : phase(-1.0)
-        , sampleRate(sampleRate) {}
+        , sampleRate(pSampleRate) {}
 
-    inline double play(double pFreq) 
+    inline double play(double pFreq)
     {
-        double output = phase;
+        const double output = phase;
         phase += (2.0 * pFreq) / sampleRate;
-        if (phase >= 1.0) phase -= 2.0;
-
+        if (phase >= 1.0)
+            phase -= 2.0;
         return output;
     }
 
     inline void reset() { phase = -1.0; }
 
-    inline void setSampleRate(double sr) { sampleRate = sr; }
+    inline void setSampleRate(double pSampleRate) { sampleRate = pSampleRate; }
 
 private:
     double phase;

@@ -2,58 +2,84 @@
 
 #include <vector>
 #include <utility>
+#include <algorithm>
 
-class LinearEnvelope 
+class LinearEnvelope
 {
 public:
-    LinearEnvelope() : currentTime(0.0), active(false), currentSegment(0) {}
+    explicit LinearEnvelope()
+        : currentTime(0.0)
+        , startValue(0.0)
+        , currentSegment(0)
+        , active(false) {}
 
-    void set(const std::vector<std::pair<double, double>>& segments) 
+    inline void set(const std::vector<std::pair<double, double>>& pSegments)
     {
-        this->segments = segments;
+        segments = pSegments;
         currentTime = 0.0;
         currentSegment = 0;
-        startValue = segments.empty() ? 0.0 : segments[0].second;
+        startValue = 0.0;
         active = !segments.empty();
     }
 
-    void reset() 
+    inline void reset()
     {
         currentTime = 0.0;
         currentSegment = 0;
-        if (!segments.empty()) startValue = segments[0].second;
+        if (!segments.empty())
+            startValue = segments[0].second;
         active = !segments.empty();
     }
 
-    double play(double dt) 
+    inline double play(double pDt)
     {
-        if (!active || segments.empty()) return segments.empty() ? 0.0 : segments.back().second;
+        if (!active || segments.empty())
+            return segments.empty() ? 0.0 : segments.back().second;
 
-        auto [segDuration, segTarget] = segments[currentSegment];
-        double value = startValue + (segTarget - startValue) * (currentTime / segDuration);
+        double value = startValue;
 
-        currentTime += dt;
-
-        if (currentTime >= segDuration) 
+        while (pDt > 0.0 && active)
         {
-            currentTime -= segDuration;
-            startValue = segTarget;
-            currentSegment++;
-            if (currentSegment >= segments.size()) 
+            const auto [segDuration, segTarget] = segments[currentSegment];
+
+            if (segDuration <= 0.0)
             {
-                active = false;
+                startValue = segTarget;
+                currentTime = 0.0;
+                currentSegment++;
+                if (currentSegment >= segments.size())
+                    active = false;
+                continue;
+            }
+
+            const double remaining = segDuration - currentTime;
+            const double step = std::min(pDt, remaining);
+
+            currentTime += step;
+            pDt -= step;
+
+            const double t = currentTime / segDuration;
+            value = startValue + (segTarget - startValue) * t;
+
+            if (currentTime >= segDuration)
+            {
+                currentTime = 0.0;
+                startValue = segTarget;
+                currentSegment++;
+                if (currentSegment >= segments.size())
+                    active = false;
             }
         }
 
         return value;
     }
 
-    bool isActive() const { return active; }
+    inline bool isActive() const { return active; }
 
 private:
     std::vector<std::pair<double, double>> segments;
-    double currentTime;
-    double startValue;
-    size_t currentSegment;
-    bool active;
+    double currentTime = 0.0;
+    double startValue = 0.0;
+    size_t currentSegment = 0;
+    bool active = false;
 };

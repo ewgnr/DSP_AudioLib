@@ -1,21 +1,28 @@
 #pragma once
-
 #include "PulseWaveGenerator.h"
 
-class RandomPulseTrain 
+class RandomPulseTrain
 {
 public:
-    RandomPulseTrain(double sampleRate = 44100.0) 
-        : pulse(sampleRate)
-		, sampleRate(sampleRate) {}
+    explicit RandomPulseTrain(double pSampleRate = 44100.0)
+        : pulse(pSampleRate)
+        , sampleRate(pSampleRate) {}
 
-    double play(double dt, double gap) 
+    inline double play(double pDt, double pGap)
     {
-        double freq = 1.0 / gap;
+        const double freq = 1.0 / pGap;
         return (pulse.play(freq) > 0.0) ? 1.0 : 0.0;
     }
 
-    void setPulseWidth(double pw) { pulse.setPulseWidth(pw); }
+    inline void setPulseWidth(double pPulseWidth)
+    {
+        pulse.setPulseWidth(pPulseWidth);
+    }
+
+    inline void reset()
+    {
+        pulse.reset();
+    }
 
 private:
     PulseWaveGenerator pulse;

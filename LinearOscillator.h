@@ -1,20 +1,31 @@
+#pragma once
+
 class LinearOscillator
 {
 public:
-    LinearOscillator(double sr = 44100.0) 
+    explicit LinearOscillator(double pSampleRate = 44100.0)
         : phase(0.0)
-        , sampleRate(sr) {}
+        , sampleRate(pSampleRate) {}
 
-    inline double play(double freq)
+    inline double play(double pFreq)
     {
-        double out = phase;
-        phase += freq / sampleRate;
+        const double out = phase;
+        phase += pFreq / sampleRate;
         if (phase >= 1.0) phase -= 1.0;
-        
         return out;
     }
 
+    inline void reset()
+    {
+        phase = 0.0;
+    }
+
+    inline void setSampleRate(double pSampleRate)
+    {
+        sampleRate = pSampleRate;
+    }
+
 private:
-    double phase;
+    double phase = 0.0;
     double sampleRate;
 };

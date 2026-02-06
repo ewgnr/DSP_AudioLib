@@ -3,33 +3,31 @@
 class Voice
 {
 public:
-	Voice()
-		: freqHz(0.0)
-		, remainingSamples(0)
-		, active(false) { }
+    explicit Voice()
+        : freqHz(0.0)
+        , remainingSamples(0)
+        , active(false) {}
 
-	inline void start(double frequency, double durationSec, double sampleRate)
-	{
-		freqHz = frequency;
-		remainingSamples = static_cast<int>(durationSec * sampleRate + 0.5);
-		active = true;
-	}
+    inline void start(double pFrequency, double pDurationSec, double pSampleRate)
+    {
+        freqHz = pFrequency;
+        remainingSamples = static_cast<int>(pDurationSec * pSampleRate + 0.5);
+        active = true;
+    }
 
-	inline void play()
-	{
-		if (active && remainingSamples > 0)
-		{
-			--remainingSamples;
+    inline void play()
+    {
+        if (!active || remainingSamples <= 0) return;
 
-			if (remainingSamples <= 0) active = false;
-		}
-	}
+        --remainingSamples;
+        if (remainingSamples <= 0) active = false;
+    }
 
-	inline bool isActive() const { return active; }
-	inline double getFrequency() const { return freqHz; }
+    inline bool isActive() const { return active; }
+    inline double getFrequency() const { return freqHz; }
 
 private:
-	double freqHz;
-	int remainingSamples;
-	bool active;
+    double freqHz;
+    int remainingSamples;
+    bool active;
 };

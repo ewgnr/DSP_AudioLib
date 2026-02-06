@@ -1,35 +1,41 @@
 #pragma once
 #include <cmath>
+#include <algorithm>
 
-class PulseWaveGenerator 
+class PulseWaveGenerator
 {
 public:
-    PulseWaveGenerator(double sampleRate = 44100.0, double pulseWidth = 0.5)
-        : phase(0.0) 
-        , sampleRate(sampleRate)
-        , pulseWidth(pulseWidth) {}
+    explicit PulseWaveGenerator(double pSampleRate = 44100.0, double pPulseWidth = 0.5)
+        : phase(0.0)
+        , sampleRate(pSampleRate)
+        , pulseWidth(std::clamp(pPulseWidth, 0.0, 1.0)) {}
 
-    inline double play(double pFreq) 
+    inline double play(double pFreq)
     {
-        double output = (phase < pulseWidth) ? 1.0 : -1.0; // pulse wave -1 to 1
+        const double output = (phase < pulseWidth) ? 1.0 : -1.0;
         phase += pFreq / sampleRate;
-        if (phase >= 1.0) phase -= 1.0;
-
+        if (phase >= 1.0)
+            phase -= 1.0;
         return output;
     }
 
-
-    inline void reset() { phase = 0.0; }
-    inline void setSampleRate(double sr) { sampleRate = sr; }
-    inline void setPulseWidth(double pw) 
+    inline void reset()
     {
-        if (pw < 0.0) pw = 0.0;
-        if (pw > 1.0) pw = 1.0;
-        pulseWidth = pw;
+        phase = 0.0;
+    }
+
+    inline void setSampleRate(double pSampleRate)
+    {
+        sampleRate = pSampleRate;
+    }
+
+    inline void setPulseWidth(double pPulseWidth)
+    {
+        pulseWidth = std::clamp(pPulseWidth, 0.0, 1.0);
     }
 
 private:
-    double phase;
+    double phase = 0.0;
     double sampleRate;
     double pulseWidth;
 };

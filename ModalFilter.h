@@ -1,58 +1,76 @@
 #pragma once
 #include <cmath>
-#include <iostream>
 
-class ModalFilter 
+#ifndef M_PI
+	#define M_PI 3.14159265358979323846
+#endif
+
+class ModalFilter
 {
 public:
-    ModalFilter(double sampleRate = 44100.0)
-        : x1(0)
-        , y1(0)
-        , y2(0)
-        , alpha(0)
-        , beta(0)
-        , sum(0)
-        , frq(0)
-        , q(0)
-        , amp(0)
-        , out(0)
-        , sampleRate(sampleRate) {}
+    explicit ModalFilter(double pSampleRate = 44100.0)
+        : sampleRate(pSampleRate) {}
 
-    void init(double pFrq, double pQ, double pAmp) 
+    inline void init(double pFrq, double pQ, double pAmp)
     {
         frq = pFrq;
-        q = pQ;
+        q   = pQ;
         amp = pAmp;
-
-        if (sampleRate / frq < M_PI) 
-        {
-            std::cerr << "Warning: Filter may be unstable (sr/frq < pi)" << std::endl;
-        }
-
-        double omega = 2.0 * M_PI * frq;
-        alpha = sampleRate / omega;
-        beta = alpha * alpha;
+        computeCoeffs();
     }
 
-    inline double play(double pIn) 
+    inline void setParams(double pFrq, double pQ, double pAmp)
     {
-        x1 = pIn;
-
-        sum = (-(1.0 - 2.0 * beta) * y1 + x1 - (beta - alpha / (2.0 * q)) * y2) / (beta + alpha / (2.0 * q));
-        y2 = y1;
-        y1 = sum;
-
-        out = sum * sampleRate / (2.0 * 2.0 * M_PI * frq) * amp; // normalizing factor
-        return out;
+        frq = pFrq;
+        q   = pQ;
+        amp = pAmp;
+        computeCoeffs();
     }
 
-    inline void reset() { x1 = y1 = y2 = sum = out = 0.0; }
+    inline double play(double pIn)
+    {
+        const double denom = beta + alpha / (2.0 * q);
+        if (denom <= 0.0)
+            return 0.0;
 
-    inline void setSampleRate(double sr) { sampleRate = sr; }
+        const double y = (-(1.0 - 2.0 * beta) * y1
+                          + pIn
+                          - (beta - alpha / (2.0 * q)) * y2) / denom;
+
+        y2 = y1;
+        y1 = y;
+
+        return y * sampleRate / (4.0 * M_PI * frq) * amp;
+    }
+
+    inline void reset()
+    {
+        y1 = y2 = 0.0;
+    }
+
+    inline void setSampleRate(double pSampleRate)
+    {
+        sampleRate = pSampleRate;
+        computeCoeffs();
+    }
 
 private:
-    double x1, y1, y2;
-    double alpha, beta, sum;
-    double frq, q, amp, out;
+    inline void computeCoeffs()
+    {
+        if (frq <= 0.0)
+            return;
+
+        const double omega = 2.0 * M_PI * frq;
+        alpha = sampleRate / omega;
+        beta  = alpha * alpha;
+    }
+
+    double y1 = 0.0;
+    double y2 = 0.0;
+    double alpha = 0.0;
+    double beta = 0.0;
+    double frq = 0.0;
+    double q = 1.0;
+    double amp = 0.0;
     double sampleRate;
 };

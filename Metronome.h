@@ -4,15 +4,16 @@
 class Metronome
 {
 public:
-    Metronome(double sampleRate = 44100.0)
+    explicit Metronome(double pSampleRate = 44100.0)
         : phase(0.0)
-        , sampleRate(sampleRate) {}
+        , sampleRate(pSampleRate) {}
 
-    inline double play(double freq)
+    inline double play(double pFreq)
     {
-        if (freq <= 0.0) return 0.0;
+        if (pFreq <= 0.0)
+            return 0.0;
 
-        phase += freq / sampleRate;
+        phase += pFreq / sampleRate;
 
         if (phase >= 1.0)
         {
@@ -23,11 +24,17 @@ public:
         return 0.0;
     }
 
-    inline void reset() { phase = 0.0; }
+    inline void reset()
+    {
+        phase = 0.0;
+    }
 
-    inline void setSampleRate(double sr) { sampleRate = sr; }
+    inline void setSampleRate(double pSampleRate)
+    {
+        sampleRate = pSampleRate;
+    }
 
 private:
-    double phase;
+    double phase = 0.0;
     double sampleRate;
 };
